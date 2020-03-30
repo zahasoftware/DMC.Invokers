@@ -4,4 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NetXP.NetStandard" Version="1.17.0" />
+  </ItemGroup>
+
 </Project>

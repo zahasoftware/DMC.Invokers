@@ -10,6 +10,6 @@ namespace DMC.Invokers.Domains
         public string Interface { get; set; }
         public string Method { get; set; }
         public DInvokerMethodParamValue[] Params { get; set; }
-
+        public string InvokerId { get; set; }
     }
 }
