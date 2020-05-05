@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
 
 namespace DMC.Invokers
@@ -63,7 +64,7 @@ namespace DMC.Invokers
                 return pluginsDictionary;
             }
 
-            var pluginsDir = Path.Combine(this.PluginPath);
+            var pluginsDir = this.PluginPath;
 
             if (Directory.Exists(pluginsDir))
             {
@@ -73,43 +74,56 @@ namespace DMC.Invokers
                 {
                     foreach (var dir in pluginsFolder)
                     {
-                        var dllFiles = Directory.GetFiles(dir, "*.dll");
-
-                        var pluginAssembliesDictioanry = new PluginAssembliesDictionary
-                        {
-                            container = ContainerFactory?.Invoke()
-                        };
-                        pluginsDictionary[Path.GetFileName(dir)] = pluginAssembliesDictioanry;
-
-                        foreach (var dllFile in dllFiles)
-                        {
-                            if (Path.GetFileName(dllFile).Equals("dmc.invokers.dll", StringComparison.OrdinalIgnoreCase))
-                            {
-                                continue;
-                            }
-
-                            var assembly = Assembly.LoadFrom(dllFile);
-                            var assemblyTypes = assembly.GetTypes();
-
-                            var pluginTypeList = new AssemblyTypesList() { Assembly = assembly, PluginAssembliesDictionary = pluginAssembliesDictioanry };
-                            pluginAssembliesDictioanry[dllFile] = pluginTypeList;
-                            foreach (var type in assemblyTypes)
-                            {
-                                pluginTypeList.Add(
-                                  new AssemblyType
-                                  {
-                                      Type = type,
-                                      AssemblyTypesList = pluginTypeList,
-                                  });
-                            }
-                        }
-
+                        LoadPlugin(dir);
                     }
                 }
             }
             return pluginsDictionary;
         }
 
+        public void LoadPlugin(string dir)
+        {
+            var pluginAssembliesDictioanry = new PluginAssembliesDictionary
+            {
+                Container = ContainerFactory?.Invoke(),
+                PluginLoadContext = new PluginLoadContext(),
+                PluginDir = dir
+            };
+            pluginsDictionary[Path.GetFileName(dir)] = pluginAssembliesDictioanry;
+
+            var dllFiles = Directory.GetFiles(dir, "*.dll");
+            foreach (var dllFile in dllFiles)
+            {
+                //if (Path.GetFileName(dllFile).Equals("dmc.invokers.dll", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    continue;
+                //}
+
+                Assembly assembly = null;
+                //assembly = Assembly.LoadFrom(dllFile);
+                //assembly = pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext.LoadFromAssemblyPath(dllFile);
+                using (var fs = File.Open(dllFile, FileMode.Open))
+                {
+                    assembly = pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext.LoadFromStream(fs);
+                }
+
+                var assemblyTypes = assembly.GetTypes();
+
+                var pluginTypeList = new AssemblyTypesList() { Assembly = assembly, PluginAssembliesDictionary = pluginAssembliesDictioanry };
+
+                pluginAssembliesDictioanry[dllFile] = pluginTypeList;
+
+                foreach (var type in assemblyTypes)
+                {
+                    pluginTypeList.Add(
+                      new AssemblyType
+                      {
+                          Type = type,
+                          AssemblyTypesList = pluginTypeList,
+                      });
+                }
+            }
+        }
 
     }
 }
