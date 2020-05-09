@@ -2,8 +2,6 @@
 using DMC.Invokers.Domains;
 using DMC.Invokers.Exceptions;
 using NetXP.NetStandard.DependencyInjection;
-using NetXP.NetStandard.Reflection;
-using NetXP.NetStandard.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -85,7 +83,7 @@ namespace DMC.Invokers
         {
             var pluginAssembliesDictioanry = new PluginAssembliesDictionary
             {
-                Container = ContainerFactory?.Invoke(),
+                Container = new Privates.ContainerReflector(),
                 PluginLoadContext = new PluginLoadContext(),
                 PluginDir = dir
             };
@@ -94,10 +92,6 @@ namespace DMC.Invokers
             var dllFiles = Directory.GetFiles(dir, "*.dll");
             foreach (var dllFile in dllFiles)
             {
-                //if (Path.GetFileName(dllFile).Equals("dmc.invokers.dll", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    continue;
-                //}
 
                 Assembly assembly = null;
                 //assembly = Assembly.LoadFrom(dllFile);
@@ -107,20 +101,24 @@ namespace DMC.Invokers
                     assembly = pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext.LoadFromStream(fs);
                 }
 
-                var assemblyTypes = assembly.GetTypes();
-
                 var pluginTypeList = new AssemblyTypesList() { Assembly = assembly, PluginAssembliesDictionary = pluginAssembliesDictioanry };
 
                 pluginAssembliesDictioanry[dllFile] = pluginTypeList;
 
+            }
+
+            foreach (var pa in pluginAssembliesDictioanry)
+            {
+                var assemblyTypes = pa.Value.Assembly.GetTypes();
                 foreach (var type in assemblyTypes)
                 {
-                    pluginTypeList.Add(
-                      new AssemblyType
-                      {
-                          Type = type,
-                          AssemblyTypesList = pluginTypeList,
-                      });
+                    var pad = pa.Value;
+                    pad.Add(
+                                          new AssemblyType
+                                          {
+                                              Type = type,
+                                              AssemblyTypesList = pa.Value,
+                                          });
                 }
             }
         }

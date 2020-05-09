@@ -1,12 +1,11 @@
 ﻿using DMC.Invokers.Domains;
-using NetXP.NetStandard.Exceptions;
 using System;
 using System.Runtime.Serialization;
 
 namespace DMC.Invokers.Exceptions
 {
     [Serializable]
-    public class InvokerException : CustomApplicationException
+    public class InvokerException : ApplicationException
     {
         public InvokerExceptionType InvokerExceptionType { get; set; }
 

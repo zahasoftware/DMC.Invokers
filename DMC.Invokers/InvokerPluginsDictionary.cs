@@ -1,5 +1,4 @@
-﻿using NetXP.NetStandard.DependencyInjection;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace DMC.Invokers
 {

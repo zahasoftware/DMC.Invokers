@@ -1,4 +1,5 @@
-﻿using NetXP.NetStandard.DependencyInjection;
+﻿using DMC.Invokers.Privates;
+using NetXP.NetStandard.DependencyInjection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace DMC.Invokers
 {
     public class PluginAssembliesDictionary : Dictionary<string, AssemblyTypesList>
     {
-        public IContainer Container;
+        public ContainerReflector Container { get; set; }
         public AssemblyLoadContext PluginLoadContext { get; set; }
         public string PluginDir { get; internal set; }
     }
