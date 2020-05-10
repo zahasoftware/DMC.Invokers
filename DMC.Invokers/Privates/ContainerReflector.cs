@@ -32,10 +32,12 @@ namespace DMC.Invokers.Privates
 
         public void Dispose()
         {
-            var containerType = this.container.GetType();
-            var resolveMethodInfo = containerType.GetMethod("Dispose");
+            var containerType = this.container?.GetType();
+            var resolveMethodInfo = containerType?.GetMethod("Dispose");
 
-            resolveMethodInfo.Invoke(this.container, null);
+            resolveMethodInfo?.Invoke(this.container, null);
+            this.container = null;
+            this.Configuration = null;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace DMC.Invokers
     public class PluginAssembliesDictionary : Dictionary<string, AssemblyTypesList>
     {
         public ContainerReflector Container { get; set; }
-        public AssemblyLoadContext PluginLoadContext { get; set; }
+        public PluginLoadContext PluginLoadContext { get; set; }
         public string PluginDir { get; internal set; }
     }
 }

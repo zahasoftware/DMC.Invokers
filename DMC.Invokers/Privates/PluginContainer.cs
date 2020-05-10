@@ -9,7 +9,7 @@ namespace DMC.Invokers.Privates
     public class PluginContainer
     {
 
-        public SMContainer Container { get; }
+        public SMContainer Container { get; set; }
 
         public PluginContainer()
         {

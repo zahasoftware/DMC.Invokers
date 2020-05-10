@@ -26,8 +26,6 @@ namespace DMC.Invokers
             this.ContainerFactory = containerFactory;
         }
 
-
-
         private Type[] GetInvokersInterfaces()
         {
             if (invokersInterfacesTypes?.Count > 0)
@@ -84,28 +82,46 @@ namespace DMC.Invokers
             var pluginAssembliesDictioanry = new PluginAssembliesDictionary
             {
                 Container = new Privates.ContainerReflector(),
-                PluginLoadContext = new PluginLoadContext(),
+                //PluginLoadContext = new PluginLoadContext(),
                 PluginDir = dir
             };
+
             pluginsDictionary[Path.GetFileName(dir)] = pluginAssembliesDictioanry;
+
+            var dllPlugin = Directory.GetFiles(dir, "*.Plugin.dll");
+            if (dllPlugin.Count() == 0)
+            {
+                throw new ApplicationException($"There is not plugin dll in directory {dir}");
+            }
+
+            foreach (var dllFile in dllPlugin)
+            {
+                var pc = new PluginLoadContext(dllFile);
+                pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext = pc;
+            }
 
             var dllFiles = Directory.GetFiles(dir, "*.dll");
             foreach (var dllFile in dllFiles)
             {
-
-                Assembly assembly = null;
-                //assembly = Assembly.LoadFrom(dllFile);
-                //assembly = pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext.LoadFromAssemblyPath(dllFile);
-                using (var fs = File.Open(dllFile, FileMode.Open))
+                var fileName = Path.GetFileName(dllFile);
+                if (fileName.Equals("DMC.Invokers.dll")
+                 || fileName.Contains(".Plugin.dll"))
                 {
-                    assembly = pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext.LoadFromStream(fs);
+
+                    Assembly assembly = null;
+                    //assembly = Assembly.LoadFrom(dllFile);
+                    //assembly = pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext.LoadFromAssemblyPath(dllFile);
+                    //using (var fs = File.Open(dllFile, FileMode.Open))
+                    {
+                        assembly = pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(dllFile)));
+                        //assembly = pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext.LoadFromStream(fs);
+                    }
+
+                    var pluginTypeList = new AssemblyTypesList() { Assembly = assembly, PluginAssembliesDictionary = pluginAssembliesDictioanry };
+                    pluginAssembliesDictioanry[dllFile] = pluginTypeList;
                 }
-
-                var pluginTypeList = new AssemblyTypesList() { Assembly = assembly, PluginAssembliesDictionary = pluginAssembliesDictioanry };
-
-                pluginAssembliesDictioanry[dllFile] = pluginTypeList;
-
             }
+
 
             foreach (var pa in pluginAssembliesDictioanry)
             {
@@ -113,15 +129,26 @@ namespace DMC.Invokers
                 foreach (var type in assemblyTypes)
                 {
                     var pad = pa.Value;
-                    pad.Add(
-                                          new AssemblyType
-                                          {
-                                              Type = type,
-                                              AssemblyTypesList = pa.Value,
-                                          });
+                    pad.Add(new AssemblyType
+                    {
+                        Type = type,
+                        AssemblyTypesList = pa.Value,
+                    });
                 }
             }
         }
 
+        private void CopyAll(string sourcePath, string destinationPath)
+        {
+            //Now Create all of the directories
+            foreach (string dirPath in Directory.GetDirectories(sourcePath, "*",
+                SearchOption.AllDirectories))
+                Directory.CreateDirectory(dirPath.Replace(sourcePath, destinationPath));
+
+            //Copy all the files & Replaces any files with the same name
+            foreach (string newPath in Directory.GetFiles(sourcePath, "*.*",
+                SearchOption.AllDirectories))
+                File.Copy(newPath, newPath.Replace(sourcePath, destinationPath), true);
+        }
     }
 }
