@@ -5,7 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="structuremap" Version="4.7.1" />
+    <Compile Remove="Privates\PluginContainerSM.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
   </ItemGroup>
 
