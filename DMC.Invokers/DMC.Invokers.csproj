@@ -1,12 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NetXP.NetStandard" Version="1.17.0" />
+    <Compile Remove="Privates\PluginContainerSM.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\NetXP\NetXP.NetStandard.DependencyInjection.Implementations.StructureMaps\NetXP.NetStandard.DependencyInjection.Implementations.StructureMaps.csproj" />
+    <ProjectReference Include="..\..\NetXP\NetXP.NetStandard.DependencyInjection\NetXP.NetStandard.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

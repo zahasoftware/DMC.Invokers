@@ -2,13 +2,12 @@
 using DMC.Invokers.Domains;
 using DMC.Invokers.Exceptions;
 using NetXP.NetStandard.DependencyInjection;
-using NetXP.NetStandard.Reflection;
-using NetXP.NetStandard.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
 using System.Text;
 
@@ -16,7 +15,7 @@ namespace DMC.Invokers
 {
     public class InvokerPluginHelper
     {
-        private InvokerPluginsDictionary pluginsDictionary;
+        protected InvokerPluginsDictionary pluginsDictionary;
         private List<Type> invokersInterfacesTypes;
         public string PluginPath { get; set; }
         public Func<IContainer> ContainerFactory { get; set; }
@@ -27,8 +26,6 @@ namespace DMC.Invokers
             this.PluginPath = pluginPath;
             this.ContainerFactory = containerFactory;
         }
-
-
 
         private Type[] GetInvokersInterfaces()
         {
@@ -59,11 +56,11 @@ namespace DMC.Invokers
 
         public IDictionary<string, PluginAssembliesDictionary> GetPlugins()
         {
-            if (pluginsDictionary.Count > 0)
-            {
-                return pluginsDictionary;
-            }
+            return pluginsDictionary;
+        }
 
+        public IDictionary<string, PluginAssembliesDictionary> LoadPlugins()
+        {
             var pluginsDir = this.PluginPath;
 
             if (Directory.Exists(pluginsDir))
@@ -78,49 +75,56 @@ namespace DMC.Invokers
                     }
                 }
             }
-            return pluginsDictionary;
+            return this.pluginsDictionary;
         }
 
         public void LoadPlugin(string dir)
         {
             var pluginAssembliesDictioanry = new PluginAssembliesDictionary
             {
-                Container = ContainerFactory?.Invoke(),
-                PluginLoadContext = new PluginLoadContext(),
+                Container = new Privates.ContainerReflector(),
+                //PluginLoadContext = new PluginLoadContext(),
                 PluginDir = dir
             };
-            pluginsDictionary[Path.GetFileName(dir)] = pluginAssembliesDictioanry;
+
+            this.pluginsDictionary[Path.GetFileName(dir)] = pluginAssembliesDictioanry;
+
+            var dllPlugin = Directory.GetFiles(dir, "*.Plugin.dll");
+            if (dllPlugin.Count() == 0)
+            {
+                throw new ApplicationException($"There is not plugin dll in directory {dir}");
+            }
+
+            foreach (var dllFile in dllPlugin)
+            {
+                var pc = new PluginLoadContext(dllFile);
+                pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext = pc;
+            }
 
             var dllFiles = Directory.GetFiles(dir, "*.dll");
             foreach (var dllFile in dllFiles)
             {
-                //if (Path.GetFileName(dllFile).Equals("dmc.invokers.dll", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    continue;
-                //}
-
-                Assembly assembly = null;
-                //assembly = Assembly.LoadFrom(dllFile);
-                //assembly = pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext.LoadFromAssemblyPath(dllFile);
-                using (var fs = File.Open(dllFile, FileMode.Open))
+                var fileName = Path.GetFileName(dllFile);
+                if (fileName.Equals("DMC.Invokers.dll") || fileName.Contains(".Plugin.dll"))
                 {
-                    assembly = pluginsDictionary[Path.GetFileName(dir)].PluginLoadContext.LoadFromStream(fs);
+                    var assembly = pluginAssembliesDictioanry.PluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(dllFile)));
+
+                    var pluginTypeList = new AssemblyTypesList() { Assembly = assembly, PluginAssembliesDictionary = pluginAssembliesDictioanry };
+                    pluginAssembliesDictioanry[dllFile] = pluginTypeList;
                 }
+            }
 
-                var assemblyTypes = assembly.GetTypes();
-
-                var pluginTypeList = new AssemblyTypesList() { Assembly = assembly, PluginAssembliesDictionary = pluginAssembliesDictioanry };
-
-                pluginAssembliesDictioanry[dllFile] = pluginTypeList;
-
+            foreach (var pa in pluginAssembliesDictioanry)
+            {
+                var assemblyTypes = pa.Value.Assembly.GetTypes();
                 foreach (var type in assemblyTypes)
                 {
-                    pluginTypeList.Add(
-                      new AssemblyType
-                      {
-                          Type = type,
-                          AssemblyTypesList = pluginTypeList,
-                      });
+                    var pad = pa.Value;
+                    pad.Add(new AssemblyType
+                    {
+                        Type = type,
+                        AssemblyTypesList = pa.Value,
+                    });
                 }
             }
         }

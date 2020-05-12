@@ -15,5 +15,6 @@ namespace DMC.Invokers.Domains
         public string OS { get; set; }
         public string Id { get; set; }
         public string Name { get; set; }
+        public int Version { get; set; }
     }
 }
