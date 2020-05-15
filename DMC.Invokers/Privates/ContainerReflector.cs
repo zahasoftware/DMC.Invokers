@@ -23,6 +23,11 @@ namespace DMC.Invokers.Privates
 
         public object Resolve(Type interfaceType)
         {
+            if (container == null)
+            {
+                throw new NullContainerException();
+            }
+
             var containerType = this.container.GetType();
             var resolveMethodInfo = containerType.GetMethod("Resolve");
             var @return = resolveMethodInfo.Invoke(this.container, new[] { interfaceType });
