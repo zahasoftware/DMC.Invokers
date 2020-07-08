@@ -5,6 +5,9 @@ using System.Text;
 
 namespace DMC.Invokers
 {
+    /// <summary>
+    /// Interface registrations
+    /// </summary>
     public interface ICompositionRoot
     {
         PluginContext PluginContext { get; set; }
