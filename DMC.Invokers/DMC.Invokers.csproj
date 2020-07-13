@@ -5,6 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AssemblyType.cs" />
+    <Compile Remove="AssemblyTypesList.cs" />
+    <Compile Remove="InvokerPluginHelper.cs" />
+    <Compile Remove="InvokerPluginsDictionary.cs" />
+    <Compile Remove="PluginAssembliesDictionary.cs" />
     <Compile Remove="Privates\PluginContainerSM.cs" />
   </ItemGroup>
 
