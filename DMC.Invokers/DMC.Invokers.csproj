@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NetXP\NetXP.NetStandard.DependencyInjection.Implementations.StructureMaps\NetXP.NetStandard.DependencyInjection.Implementations.StructureMaps.csproj" />
+    <ProjectReference Include="..\..\NetXP\NetXP.NetStandard.DependencyInjection.Implementations.UnityDI\NetXP.NetStandard.DependencyInjection.Implementations.UnityDI.csproj" />
     <ProjectReference Include="..\..\NetXP\NetXP.NetStandard.DependencyInjection\NetXP.NetStandard.DependencyInjection.csproj" />
   </ItemGroup>
 

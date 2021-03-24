@@ -12,7 +12,7 @@ namespace DMC.Invokers
     {
         private AssemblyDependencyResolver _resolver;
 
-        public PluginLoadContext(string pluginPath) : base(isCollectible: true)//isCollectible doesn't appear in netstandard2.1
+        public PluginLoadContext(string pluginPath) : base(isCollectible: true)
         {
             _resolver = new AssemblyDependencyResolver(pluginPath);
         }
