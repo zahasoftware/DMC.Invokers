@@ -1,19 +1,19 @@
-﻿using NetXP.NetStandard.DependencyInjection.Implementations.StructureMaps;
-using StructureMap;
+﻿using Unity;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using NetXP.NetStandard.DependencyInjection.Implementations.UnityDI;
 
 namespace DMC.Invokers.Privates
 {
     public class PluginContainer
     {
 
-        public SMContainer Container { get; set; }
+        public UContainer Container { get; set; }
 
         public PluginContainer()
         {
-            this.Container = new SMContainer(new Container());
+            this.Container = new UContainer(new Unity.UnityContainer());
         }
 
 
