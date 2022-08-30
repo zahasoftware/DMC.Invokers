@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NetXP.NetStandard.DependencyInjection.Implementations.UnityDI;
+using NetXP.DependencyInjection.Implementations.UnityDI;
+using NetXP.DependencyInjection;
 
 namespace DMC.Invokers.Privates
 {

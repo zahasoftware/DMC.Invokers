@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,12 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NetXP.DependencyInjection" Version="1.31.1" />
+    <PackageReference Include="NetXP.DependencyInjection.Implementations.UnityDI" Version="1.31.0" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\NetXP\NetXP.NetStandard.DependencyInjection.Implementations.UnityDI\NetXP.NetStandard.DependencyInjection.Implementations.UnityDI.csproj" />
-    <ProjectReference Include="..\..\NetXP\NetXP.NetStandard.DependencyInjection\NetXP.NetStandard.DependencyInjection.csproj" />
+    <PackageReference Include="Unity" Version="5.11.10" />
   </ItemGroup>
 
 </Project>
